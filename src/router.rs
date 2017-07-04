@@ -4,8 +4,9 @@ extern crate serde_json;
 
 
 use self::rocket_contrib::Template;
-use rocket::request::{Form, FromForm};
+use rocket::request::{Form};
 use rocket::response::Redirect;
+use bcrypt::{verify};
 
 #[derive(Serialize, Deserialize)]
 pub struct IndexContext {
@@ -15,6 +16,7 @@ pub struct IndexContext {
 #[derive(Serialize, Deserialize)]
 pub struct RegisterContext {
     title: String,
+    errors: Option<String>,
 }
 
 #[derive(FromForm)]
@@ -28,6 +30,12 @@ pub struct LoginContext {
     title: String,
 }
 
+#[derive(FromForm)]
+pub struct LoginForm {
+    user_name: String,
+    password: String,
+}
+
 #[get("/")]
 pub fn index() -> Template {
     let context = IndexContext{ name: "Jack".to_string() };
@@ -37,7 +45,7 @@ pub fn index() -> Template {
 
 #[get("/register")]
 pub fn register() -> Template {
-    let context = RegisterContext{ title: "Registration Page".to_string() };
+    let context = RegisterContext{ title: "Registration Page".to_string(), errors: None };
 
     Template::render("register", &context)
 }
@@ -64,4 +72,26 @@ pub fn login() -> Template {
     let context = LoginContext{ title: "Login Page".to_string() };
 
     Template::render("login", &context)
+}
+
+#[post("/login", format = "application/x-www-form-urlencoded", data = "<login>")]
+pub fn login_post(login: Form<LoginForm>) -> Redirect {
+    let login_form = login.get();
+
+    // Get user
+    let connection = ::repository::establish_connection();
+    let user = ::repository::get_user_by_username(&connection, &login_form.user_name);
+
+    match user {
+        Some(user) => {
+            match verify(&login_form.password, &user.password) {
+                Ok(valid) => {
+                    println!("{}", valid);
+                    return Redirect::to("/")
+                },
+                Err(_) => return Redirect::to("/"),
+            }
+        },
+        None => return Redirect::to("/")
+    }
 }

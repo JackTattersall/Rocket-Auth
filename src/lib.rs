@@ -17,6 +17,7 @@ extern crate rocket;
 extern crate serde_json;
 extern crate serde;
 extern crate dotenv;
+extern crate bcrypt;
 
 #[cfg(test)]
 mod tests {

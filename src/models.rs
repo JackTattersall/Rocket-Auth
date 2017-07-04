@@ -1,5 +1,6 @@
 use super::schema::user;
 
+#[derive(Clone)]
 #[derive(Queryable)]
 pub struct User {
     pub id: i32,
