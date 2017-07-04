@@ -4,3 +4,5 @@ version = "0.1.0"
 authors = ["JackTattersall <jack.tattersall@opencastsoftware.com>"]
 
 [dependencies]
+rocket = "0.2.8"
+rocket_codegen = "0.2.8"
