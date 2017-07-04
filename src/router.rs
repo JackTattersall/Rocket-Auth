@@ -2,7 +2,10 @@ extern crate rocket_contrib;
 extern crate rocket;
 extern crate serde_json;
 
+
 use self::rocket_contrib::Template;
+use rocket::request::{Form, FromForm};
+use rocket::response::Redirect;
 
 #[derive(Serialize, Deserialize)]
 pub struct IndexContext {
@@ -12,6 +15,12 @@ pub struct IndexContext {
 #[derive(Serialize, Deserialize)]
 pub struct RegisterContext {
     title: String,
+}
+
+#[derive(FromForm)]
+pub struct RegistrationForm {
+    user_name: String,
+    password: String,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -31,6 +40,15 @@ pub fn register() -> Template {
     let context = RegisterContext{ title: "Registration Page".to_string() };
 
     Template::render("register", &context)
+}
+
+#[post("/register", format = "application/x-www-form-urlencoded", data = "<registration>")]
+pub fn register_post(registration: Form<RegistrationForm>) -> Redirect {
+    let registration_form = registration.get();
+
+    let connection = ::repository::establish_connection();
+    ::repository::create_user(&connection, &registration_form.user_name, &registration_form.password);
+    Redirect::to("/login")
 }
 
 #[get("/login")]
