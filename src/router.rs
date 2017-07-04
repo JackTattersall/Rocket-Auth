@@ -4,10 +4,28 @@ extern crate serde_json;
 
 
 use self::rocket_contrib::Template;
-use rocket::request::{Form, FlashMessage};
+use rocket::request;
+use rocket::request::{Form, FlashMessage, FromRequest, Request};
 use rocket::response::{Redirect, Flash};
 use rocket::http::{Cookie, Cookies};
 use bcrypt::{verify};
+
+// re-implement when 0.3.0 is acquired
+//
+//#[derive(Debug)]
+//struct User(usize);
+//
+//impl<'a, 'r> FromRequest<'a, 'r> for User {
+//    type Error = ();
+//
+//    fn from_request(request: &'a Request<'r>) -> request::Outcome<User, ()> {
+//        request.cookies()
+//            .get_private("user_id")
+//            .and_then(|cookie| cookie.value().parse().ok())
+//            .map(|id| User(id))
+//            .or_forward(())
+//    }
+//}
 
 #[derive(Serialize, Deserialize)]
 pub struct IndexContext {
@@ -92,9 +110,8 @@ pub fn login_post(mut cookies: &Cookies, login: Form<LoginForm>) -> Flash<Redire
     match user {
         Some(user) => {
             match verify(&login_form.password, &user.password) {
-                Ok(valid) => {
-                    println!("{}", valid);
-                    cookies.add(Cookie::new("session_key", "123456787654321"));
+                Ok(_) => {
+                    //cookies.add_private(Cookie::new("user_id", user.id.to_string()));
                     Flash::success(Redirect::to("/"), "Successfully logged in")
                 },
                 Err(_) => Flash::error(Redirect::to("/login"), "Incorrect Password"),
@@ -106,7 +123,7 @@ pub fn login_post(mut cookies: &Cookies, login: Form<LoginForm>) -> Flash<Redire
 
 #[get("/logged_out")]
 pub fn logout(cookies: &Cookies) -> Template {
-    cookies.remove("session_key");
+    //cookies.remove_private(Cookie::named("user_id"));
     Template::render("logged_out", &"")
 }
 
