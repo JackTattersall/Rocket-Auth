@@ -6,3 +6,11 @@ authors = ["JackTattersall <jack.tattersall@opencastsoftware.com>"]
 [dependencies]
 rocket = "0.2.8"
 rocket_codegen = "0.2.8"
+serde = "^0.9.3"
+serde_derive = "^0.9.3"
+serde_json = "^0.9.3"
+
+[dependencies.rocket_contrib]
+rocket_contrib = "0.2.8"
+default-features = false
+features = ["handlebars_templates"]
