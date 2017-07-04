@@ -4,8 +4,9 @@ extern crate serde_json;
 
 
 use self::rocket_contrib::Template;
-use rocket::request::{Form};
-use rocket::response::Redirect;
+use rocket::request::{Form, FlashMessage};
+use rocket::response::{Redirect, Flash};
+use rocket::http::{Cookie, Cookies};
 use bcrypt::{verify};
 
 #[derive(Serialize, Deserialize)]
@@ -42,6 +43,12 @@ pub fn index() -> Template {
 
     Template::render("index", &context)
 }
+// implement this when i have the 0.3.0
+//
+//#[get("/", rank = 2)]
+//fn index_unauthorised() -> Redirect {
+//    Redirect::to("/login")
+//}
 
 #[get("/register")]
 pub fn register() -> Template {
@@ -75,7 +82,7 @@ pub fn login() -> Template {
 }
 
 #[post("/login", format = "application/x-www-form-urlencoded", data = "<login>")]
-pub fn login_post(login: Form<LoginForm>) -> Redirect {
+pub fn login_post(mut cookies: &Cookies, login: Form<LoginForm>) -> Flash<Redirect> {
     let login_form = login.get();
 
     // Get user
@@ -87,11 +94,22 @@ pub fn login_post(login: Form<LoginForm>) -> Redirect {
             match verify(&login_form.password, &user.password) {
                 Ok(valid) => {
                     println!("{}", valid);
-                    return Redirect::to("/")
+                    cookies.add(Cookie::new("session_key", "123456787654321"));
+                    Flash::success(Redirect::to("/"), "Successfully logged in")
                 },
-                Err(_) => return Redirect::to("/"),
+                Err(_) => Flash::error(Redirect::to("/login"), "Incorrect Password"),
             }
         },
-        None => return Redirect::to("/")
+        None => Flash::error(Redirect::to("/login"), "Incorrect Username")
     }
 }
+
+#[get("/logged_out")]
+pub fn logout(cookies: &Cookies) -> Template {
+    cookies.remove("session_key");
+    Template::render("logged_out", &"")
+}
+
+// todo Get the 0.3.0 Rocket straight from github
+// change &Cookies to Cookies
+// implement private session cookies and a
