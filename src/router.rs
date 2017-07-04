@@ -46,9 +46,17 @@ pub fn register() -> Template {
 pub fn register_post(registration: Form<RegistrationForm>) -> Redirect {
     let registration_form = registration.get();
 
+    // todo Handle errors, verification etc
     let connection = ::repository::establish_connection();
-    ::repository::create_user(&connection, &registration_form.user_name, &registration_form.password);
-    Redirect::to("/login")
+
+    let result = ::repository::create_user(
+        &connection, &registration_form.user_name, &registration_form.password
+    );
+
+    match result {
+        Some(_) => Redirect::to("/login"),
+        None => Redirect::to("/register")
+    }
 }
 
 #[get("/login")]

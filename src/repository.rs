@@ -13,7 +13,7 @@ pub fn establish_connection() -> PgConnection {
         .expect(&format!("Error connecting to {}", database_url))
 }
 
-pub fn create_user<'a>(conn: &PgConnection, username: &'a str, password: &'a str) -> User {
+pub fn create_user<'a>(conn: &PgConnection, username: &'a str, password: &'a str) -> Option<User> {
     use schema::user;
 
     let new_user = NewUser {
@@ -21,7 +21,10 @@ pub fn create_user<'a>(conn: &PgConnection, username: &'a str, password: &'a str
         password: password,
     };
 
-    super::diesel::insert(&new_user).into(user::table)
-        .get_result(conn)
-        .expect("Error saving new post")
+    let user_result = super::diesel::insert(&new_user).into(user::table).get_result(conn);
+    match user_result {
+        Ok(user) => Some(user),
+        Err(_) => None,
+    }
+
 }
