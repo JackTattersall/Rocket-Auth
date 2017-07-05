@@ -1,26 +1,72 @@
 {{#*inline "page"}}
-    <form method="post">
-        <table border="0" align="center">
-            <tbody>
+    <div id="signupbox" style="margin-top:50px" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <div class="panel-title">Sign Up</div>
+                <div style="float:right; font-size: 85%; position: relative; top:-10px"><a id="signinlink" href="#" onclick="$('#signupbox').hide(); $('#loginbox').show()">Sign In</a></div>
+            </div>
+            <div class="panel-body" >
+                <form method="post" id="signupform" class="form-horizontal" role="form">
 
-            <tr>
-                <td><label for="user_name">Username: </label></td>
-                <td><input id="user_name" maxlength="50" name="user_name" type="text" /></td>
-            </tr>
+                    <div id="signupalert" style="display:none" class="alert alert-danger">
+                        <p>Error:</p>
+                        <span></span>
+                    </div>
 
-            <tr>
-                <td><label for="password">Password:</label></td>
-                <td><input id="password" maxlength="50" name="password"
-                           type="password" /></td>
-            </tr>
+                    <div class="form-group">
+                        <label for="username" class="col-md-3 control-label">Username</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" name="user_name" placeholder="Username">
+                        </div>
+                    </div>
 
-            <tr>
-                <td align="right"><input type="submit" value="Submit"></td>
-            </tr>
+                    <!--<div class="form-group">-->
+                    <!--<label for="firstname" class="col-md-3 control-label">First Name</label>-->
+                    <!--<div class="col-md-9">-->
+                    <!--<input type="text" class="form-control" name="firstname" placeholder="First Name">-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="form-group">-->
+                    <!--<label for="lastname" class="col-md-3 control-label">Last Name</label>-->
+                    <!--<div class="col-md-9">-->
+                    <!--<input type="text" class="form-control" name="lastname" placeholder="Last Name">-->
+                    <!--</div>-->
+                    <!--</div>-->
 
-            </tbody>
-        </table>
-    </form>
+                    <div class="form-group">
+                        <label for="password" class="col-md-3 control-label">Password</label>
+                        <div class="col-md-9">
+                            <input type="password" class="form-control" name="password" placeholder="Password">
+                        </div>
+                    </div>
+
+                    <!--<div class="form-group">-->
+                    <!--<label for="icode" class="col-md-3 control-label">Invitation Code</label>-->
+                    <!--<div class="col-md-9">-->
+                    <!--<input type="text" class="form-control" name="icode" placeholder="">-->
+                    <!--</div>-->
+                    <!--</div>-->
+
+                    <div class="form-group">
+                        <!-- Button -->
+                        <div class="col-md-offset-3 col-md-9">
+                            <button id="btn-signup" type="submit" class="btn btn-info"><i class="icon-hand-right"></i> &nbsp Sign Up</button>
+                            <!--<span style="margin-left:8px;">or</span>-->
+                        </div>
+                    </div>
+
+                    <!--<div style="border-top: 1px solid #999; padding-top:20px"  class="form-group">-->
+
+                    <!--<div class="col-md-offset-3 col-md-9">-->
+                    <!--<button id="btn-fbsignup" type="button" class="btn btn-primary"><i class="icon-facebook"></i>   Sign Up with Facebook</button>-->
+                    <!--</div>-->
+
+                    <!--</div>-->
+
+                </form>
+            </div>
+        </div>
+    </div>
 {{/inline}}
 {{! remove whitespaces with ~ }}
 {{~> (parent)~}}

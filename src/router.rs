@@ -176,7 +176,6 @@ pub fn logout(mut cookies: Cookies) -> Template {
 
 #[get("/<path..>", rank = 5)]
 fn all(path: PathBuf) -> Option<NamedFile> {
-    println!("{}", path.file_name().unwrap().to_str().unwrap());
     NamedFile::open(Path::new("static/").join(path)).ok()
 }
 

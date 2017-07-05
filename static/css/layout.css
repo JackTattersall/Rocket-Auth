@@ -1,0 +1,24 @@
+.containerNew {
+  background-color: #00d500;
+  margin-right: auto;
+  margin-left: auto;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+a {
+  color: #a50a0d;
+}
+
+.panel-title {
+  color: #a50a0d;
+}
+
+.panel > .panel-heading {
+  background-color: #00d500;
+  color: #00d500;
+}
+
+.panel {
+  border-color: #00d500;
+}
