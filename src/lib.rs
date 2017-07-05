@@ -14,6 +14,7 @@ pub mod schema;
 pub mod repository;
 
 extern crate rocket;
+extern crate rocket_contrib;
 extern crate serde_json;
 extern crate serde;
 extern crate dotenv;

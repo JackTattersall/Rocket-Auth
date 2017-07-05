@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <title>Handlebars Demo</title>
-</head>
-<body>
+{{#*inline "page"}}
     <h1>Hi {{name}}</h1>
     <p><a href="/register">Register here</a></p>
     <p><a href="/login">Login here</a></p>
     <p><a href="/logged_out">Log out!</a></p>
-</body>
-</html>
+{{/inline}}
+{{! remove whitespaces with ~ }}
+{{~> (parent)~}}

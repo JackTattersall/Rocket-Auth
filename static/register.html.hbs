@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8"/>
-    <title>{{ title }}</title>
-</head>
-<body>
+{{#*inline "page"}}
     <form method="post">
         <table border="0" align="center">
             <tbody>
@@ -27,5 +21,6 @@
             </tbody>
         </table>
     </form>
-</body>
-</html>
+{{/inline}}
+{{! remove whitespaces with ~ }}
+{{~> (parent)~}}

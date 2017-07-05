@@ -1,42 +1,65 @@
-extern crate rocket_contrib;
-extern crate rocket;
-extern crate serde_json;
-
-
-use self::rocket_contrib::Template;
+use rocket_contrib::Template;
 use rocket::request;
-use rocket::request::{Form, FlashMessage, FromRequest, Request};
+use rocket::request::{Form, FromRequest, Request};
 use rocket::response::{Redirect, Flash};
 use rocket::http::{Cookie, Cookies};
+use rocket::outcome::IntoOutcome;
 use bcrypt::{verify};
+use std::path::{Path, PathBuf};
+use rocket::response::NamedFile;
 
-// re-implement when 0.3.0 is acquired
-//
-//#[derive(Debug)]
-//struct User(usize);
-//
-//impl<'a, 'r> FromRequest<'a, 'r> for User {
-//    type Error = ();
-//
-//    fn from_request(request: &'a Request<'r>) -> request::Outcome<User, ()> {
-//        request.cookies()
-//            .get_private("user_id")
-//            .and_then(|cookie| cookie.value().parse().ok())
-//            .map(|id| User(id))
-//            .or_forward(())
-//    }
-//}
+//--------------------------------Guards------------------------------------------------------------
+
+#[derive(Debug)]
+pub struct User(usize);
+
+impl<'a, 'r> FromRequest<'a, 'r> for User {
+    type Error = ();
+
+    fn from_request(request: &'a Request<'r>) -> request::Outcome<User, ()> {
+        request.cookies()
+            .get_private("user_id")
+            .and_then(|cookie| cookie.value().parse().ok())
+            .map(|id| User(id))
+            .or_forward(())
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+
+
+//-------------------------------Contexts To Render-------------------------------------------------
 
 #[derive(Serialize, Deserialize)]
 pub struct IndexContext {
     name: String,
+    title: String,
+    parent: String,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct RegisterContext {
     title: String,
     errors: Option<String>,
+    parent: String,
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct LoginContext {
+    title: String,
+    parent: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct LogoutContext {
+    title: String,
+    parent: String,
+}
+
+//--------------------------------------------------------------------------------------------------
+
+
+//---------------------------------Forms------------------------------------------------------------
 
 #[derive(FromForm)]
 pub struct RegistrationForm {
@@ -44,10 +67,7 @@ pub struct RegistrationForm {
     password: String,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct LoginContext {
-    title: String,
-}
+
 
 #[derive(FromForm)]
 pub struct LoginForm {
@@ -55,22 +75,35 @@ pub struct LoginForm {
     password: String,
 }
 
+//--------------------------------------------------------------------------------------------------
+
+
+//---------------------------------Routes-Controllers-----------------------------------------------
+
 #[get("/")]
-pub fn index() -> Template {
-    let context = IndexContext{ name: "Jack".to_string() };
+pub fn index(user: User) -> Template {   // Try this / route first, skip if user guard not satisfied
+    let context = IndexContext{
+        name: "Jack".to_string(),
+        parent: "layout".to_string(),
+        title: "Index".to_string()
+    };
+    println!("User id {}", user.0);
 
     Template::render("index", &context)
 }
-// implement this when i have the 0.3.0
-//
-//#[get("/", rank = 2)]
-//fn index_unauthorised() -> Redirect {
-//    Redirect::to("/login")
-//}
+
+#[get("/", rank = 2)]
+fn index_unauthorised() -> Redirect {
+    Redirect::to("/login")
+}
 
 #[get("/register")]
 pub fn register() -> Template {
-    let context = RegisterContext{ title: "Registration Page".to_string(), errors: None };
+    let context = RegisterContext{
+        title: "Registration".to_string(),
+        errors: None,
+        parent: "layout".to_string()
+    };
 
     Template::render("register", &context)
 }
@@ -93,14 +126,22 @@ pub fn register_post(registration: Form<RegistrationForm>) -> Redirect {
 }
 
 #[get("/login")]
+fn login_user(_user: User) -> Redirect {
+    Redirect::to("/")
+}
+
+#[get("/login", rank=2)]
 pub fn login() -> Template {
-    let context = LoginContext{ title: "Login Page".to_string() };
+    let context = LoginContext{
+        title: "Login".to_string(),
+        parent: "layout".to_string()
+    };
 
     Template::render("login", &context)
 }
 
 #[post("/login", format = "application/x-www-form-urlencoded", data = "<login>")]
-pub fn login_post(mut cookies: &Cookies, login: Form<LoginForm>) -> Flash<Redirect> {
+pub fn login_post(mut cookies: Cookies, login: Form<LoginForm>) -> Flash<Redirect> {
     let login_form = login.get();
 
     // Get user
@@ -111,7 +152,7 @@ pub fn login_post(mut cookies: &Cookies, login: Form<LoginForm>) -> Flash<Redire
         Some(user) => {
             match verify(&login_form.password, &user.password) {
                 Ok(_) => {
-                    //cookies.add_private(Cookie::new("user_id", user.id.to_string()));
+                    cookies.add_private(Cookie::new("user_id", user.id.to_string()));
                     Flash::success(Redirect::to("/"), "Successfully logged in")
                 },
                 Err(_) => Flash::error(Redirect::to("/login"), "Incorrect Password"),
@@ -122,11 +163,20 @@ pub fn login_post(mut cookies: &Cookies, login: Form<LoginForm>) -> Flash<Redire
 }
 
 #[get("/logged_out")]
-pub fn logout(cookies: &Cookies) -> Template {
-    //cookies.remove_private(Cookie::named("user_id"));
-    Template::render("logged_out", &"")
+pub fn logout(mut cookies: Cookies) -> Template {
+    cookies.remove_private(Cookie::named("user_id"));
+
+    let context = LogoutContext{
+        title: "Logout".to_string(),
+        parent: "layout".to_string()
+    };
+
+    Template::render("logged_out", &context)
 }
 
-// todo Get the 0.3.0 Rocket straight from github
-// change &Cookies to Cookies
-// implement private session cookies and a
+#[get("/<path..>", rank = 5)]
+fn all(path: PathBuf) -> Option<NamedFile> {
+    println!("{}", path.file_name().unwrap().to_str().unwrap());
+    NamedFile::open(Path::new("static/").join(path)).ok()
+}
+

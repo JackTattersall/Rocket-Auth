@@ -1,0 +1,22 @@
+{
+  "name": "rocket_auth",
+  "version": "1.0.0",
+  "description": "rocket web app",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JackTattersall/Rocket-Auth.git"
+  },
+  "keywords": [
+    "rocket"
+  ],
+  "author": "jack tattersall",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JackTattersall/Rocket-Auth/issues"
+  },
+  "homepage": "https://github.com/JackTattersall/Rocket-Auth#readme"
+}
