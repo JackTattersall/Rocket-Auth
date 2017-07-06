@@ -5,13 +5,20 @@ extern crate rocket;
 extern crate rocket_auth;
 extern crate rocket_contrib;
 
+use rocket_auth::controllers::{static_controllers, authentication_controllers};
+
 use rocket_contrib::Template;
 
 fn main() {
     rocket::ignite().mount("/", routes![
-    rocket_auth::router::index, rocket_auth::router::register, rocket_auth::router::login,
-    rocket_auth::router::register_post, rocket_auth::router::login_post, rocket_auth::router::logout,
-    rocket_auth::router::index_unauthorised, rocket_auth::router::login_user,
-    rocket_auth::router::all
+    authentication_controllers::login,
+    authentication_controllers::register,
+    authentication_controllers::index,
+    authentication_controllers::index_unauthorised,
+    authentication_controllers::login_post,
+    authentication_controllers::login_user,
+    authentication_controllers::logout,
+    authentication_controllers::register_post,
+    static_controllers::all
     ]).attach(Template::fairing()).launch();
 }

@@ -8,10 +8,10 @@
 #[macro_use] extern crate diesel;
 #[macro_use] extern crate diesel_codegen;
 
-pub mod router;
+pub mod controllers;
 pub mod models;
-pub mod schema;
-pub mod repository;
+pub mod repositories;
+pub mod forms;
 
 extern crate rocket;
 extern crate rocket_contrib;

@@ -1,9 +1,12 @@
-use super::models::{User, NewUser};
-use diesel::prelude::*;
-use diesel::pg::PgConnection;
-use dotenv::dotenv;
-use std::env;
-use bcrypt::{DEFAULT_COST, hash};
+//use super::models::{User, NewUser};
+//use diesel::prelude::*;
+//use diesel::pg::PgConnection;
+//use dotenv::dotenv;
+//use std::env;
+//use bcrypt::{DEFAULT_COST, hash};
+
+use super::*;
+
 
 pub fn establish_connection() -> PgConnection {
     dotenv().ok();
@@ -15,7 +18,6 @@ pub fn establish_connection() -> PgConnection {
 }
 
 pub fn create_user<'a>(conn: &PgConnection, username: &'a str, password: &'a str) -> Option<User> {
-    use schema::user;
 
     // hash password
     // todo handle error better
@@ -29,7 +31,7 @@ pub fn create_user<'a>(conn: &PgConnection, username: &'a str, password: &'a str
         password: &hashed,
     };
 
-    let user_result = super::diesel::insert(&new_user).into(user::table).get_result(conn);
+    let user_result = diesel::insert(&new_user).into(schema::user::table).get_result(conn);
     match user_result {
         Ok(user) => Some(user),
         Err(_) => None,
@@ -37,9 +39,8 @@ pub fn create_user<'a>(conn: &PgConnection, username: &'a str, password: &'a str
 }
 
 pub fn get_user_by_username(conn: &PgConnection, user_username: &str) -> Option<User> {
-    use schema::user::dsl::*;
 
-    let user_result = user.filter(username.eq(user_username))
+    let user_result = dsl::user.filter(dsl::username.eq(user_username))
         .load::<User>(conn);
 
     // If no user found returns none
