@@ -1,5 +1,5 @@
 .containerNew {
-  background-color: #00d500;
+  background-color: #449d44;
   margin-right: auto;
   margin-left: auto;
   padding-left: 0px;
@@ -15,10 +15,16 @@ a {
 }
 
 .panel > .panel-heading {
-  background-color: #00d500;
-  color: #00d500;
+  background-color: #449d44;
+  color: #449d44;
 }
 
 .panel {
-  border-color: #00d500;
+  border-color: #398439;
+}
+
+.btn {
+  background-color: #449d44;
+  border-color: #398439
+  color: color: #a50a0d;
 }
